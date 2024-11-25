@@ -2,7 +2,12 @@
 
 // Service that is dedicated to decoding of vectors
 
-public class DecoderService
+public interface IDecoderService
+{
+    int[] Decode(int[] receivedVector, int m, List<int[][]> hMatrices);
+}
+
+public class DecoderService : IDecoderService
 {
     private readonly IMatrixService _matrixService;
     private readonly IConverterService _converterService;
