@@ -212,6 +212,9 @@ public class MatrixService : IMatrixService
                 // Calculating which result column to update by offsetting it by the block number (based on element's position in matrix B)
                 // multiplied by count of columns inside a block (equal to columns in matrix B) and adding the position inside the given block j
                 int resultColumn = blockColumn * countOfColumnsB + j;
+
+                // Updating the result for calculated row and column with product of value from matrix A and element from B matrix
+                result[resultRow][resultColumn] = valueFromA * B[i][j];
             }
         }
 
