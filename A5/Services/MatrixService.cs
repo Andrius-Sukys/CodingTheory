@@ -1,19 +1,17 @@
 ﻿namespace A5.Services;
 
 // Service that is dedicated to all matrix-related operations
+
 public interface IMatrixService
 {
     int[][] GetGeneratorMatrix(int m);
 
     int[] GetProductOfVectorAndMatrix(int[] vector, int[][] matrix, bool isBinaryCalculation = false);
 
-    int[][] GetIdentityMatrix(int size);
-
     List<int[][]> GetHMatrices(int m);
 
     int[][] GetKroneckerProduct(int[][] A, int[][] B);
 }
-
 
 public class MatrixService : IMatrixService
 {
@@ -90,27 +88,6 @@ public class MatrixService : IMatrixService
         return result;
     }
 
-    // Method used to get an identity matrix of requested size
-    public int[][] GetIdentityMatrix(int size)
-    {
-        // Initializing a new matrix that has rows of requested size
-        int[][] matrix = new int[size][];
-
-        // Working with the whole size of the matrix
-        for (int i = 0; i < size; ++i)
-        {
-            // Each row has columns of the same requested size
-            matrix[i] = new int[size];
-
-            // If column and row positions match, the value should be 1
-            matrix[i][i] = 1;
-
-            // Otherwise the value remains at 0 which was determined on initialization
-        }
-
-        return matrix;
-    }
-
     // Method used to get so-called H-matrices used when calculating Kronecker product at decoding stage
     public List<int[][]> GetHMatrices(int m)
     {
@@ -143,6 +120,27 @@ public class MatrixService : IMatrixService
         }
 
         return matrices;
+    }
+
+    // Method used to get an identity matrix of requested size
+    private int[][] GetIdentityMatrix(int size)
+    {
+        // Initializing a new matrix that has rows of requested size
+        int[][] matrix = new int[size][];
+
+        // Working with the whole size of the matrix
+        for (int i = 0; i < size; ++i)
+        {
+            // Each row has columns of the same requested size
+            matrix[i] = new int[size];
+
+            // If column and row positions match, the value should be 1
+            matrix[i][i] = 1;
+
+            // Otherwise the value remains at 0 which was determined on initialization
+        }
+
+        return matrix;
     }
 
     // Method used to get Kronecker product of two matrices A and B
