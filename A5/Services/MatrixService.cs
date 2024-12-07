@@ -1,4 +1,6 @@
-﻿namespace A5.Services;
+﻿using A5.Repositories;
+
+namespace A5.Services;
 
 // Service that is dedicated to all matrix-related operations
 
@@ -15,9 +17,26 @@ public interface IMatrixService
 
 public class MatrixService : IMatrixService
 {
+    private readonly IMatrixRepository _matrixRepository;
+
+    public MatrixService(IMatrixRepository matrixRepository)
+    {
+        _matrixRepository = matrixRepository;
+    }
+
     // Method used to get generator matrix needed for encoding, based on parameter m
     public int[][] GetGeneratorMatrix(int m)
     {
+        // Assembling a key for this generator matrix based on m
+        string key = $"GeneratorMatrix_{m}";
+
+        // If needed matrix has been calculated previously, it is in the repository
+        if (_matrixRepository.ContainsMatrix(key))
+        {
+            // If it is in the repository, it is taken from there
+            return _matrixRepository.GetMatrix(key)!;
+        }
+
         // Count of columns for generator matrix is (2^m)
         int countOfColumns = (int)Math.Pow(2, m);
 
@@ -47,6 +66,8 @@ public class MatrixService : IMatrixService
             }
         }
 
+        // Newly calculated matrix gets saved in the repository so there's no need to recalculate
+        _matrixRepository.SaveMatrix(key, matrix);
         return matrix;
     }
 
@@ -91,6 +112,16 @@ public class MatrixService : IMatrixService
     // Method used to get so-called H-matrices used when calculating Kronecker product at decoding stage
     public List<int[][]> GetHMatrices(int m)
     {
+        // Assembling a key for this set of H-matrices based on m
+        string key = $"HMatrices_{m}";
+
+        // If needed matrix set has been calculated previously, it is in the repository
+        if (_matrixRepository.ContainsMatrices(key))
+        {
+            // If it is in the repository, it is taken from there
+            return _matrixRepository.GetMatrices(key)!;
+        }
+
         // Initializing a new list of 2D matrices to store H-matrices
         List<int[][]> matrices = new List<int[][]>();
 
@@ -119,12 +150,24 @@ public class MatrixService : IMatrixService
             matrices.Add(hMatrix);
         }
 
+        // Newly calculated matrices get saved in the repository so there's no need to recalculate
+        _matrixRepository.SaveMatrices(key, matrices);
         return matrices;
     }
 
     // Method used to get an identity matrix of requested size
     private int[][] GetIdentityMatrix(int size)
     {
+        // Assembling a key for this identity matrix based on m
+        string key = $"IdentityMatrix_{size}";
+
+        // If needed matrix has been calculated previously, it is in the repository
+        if (_matrixRepository.ContainsMatrix(key))
+        {
+            // If it is in the repository, it is taken from there
+            return _matrixRepository.GetMatrix(key)!;
+        }
+
         // Initializing a new matrix that has rows of requested size
         int[][] matrix = new int[size][];
 
@@ -140,6 +183,8 @@ public class MatrixService : IMatrixService
             // Otherwise the value remains at 0 which was determined on initialization
         }
 
+        // Newly calculated matrix gets saved in the repository so there's no need to recalculate
+        _matrixRepository.SaveMatrix(key, matrix);
         return matrix;
     }
 
@@ -167,7 +212,7 @@ public class MatrixService : IMatrixService
     private int[][] GenerateKroneckerProduct(int[][] A, int[][] B, int resultRows, int resultColumns)
     {
         // Initializing a new matrix to store results
-        var result = new int[resultRows][];
+        int[][] result = new int[resultRows][];
 
         // Working with each row of the resulting matrix
         for (int i = 0; i < resultRows; ++i)
