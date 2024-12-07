@@ -12,7 +12,9 @@ public interface IValidationService
 
     bool IsBinaryVectorValid(string vector);
 
-    bool IsVectorSizeValid(string vectorSize, string m);
+    bool IsInputVectorSizeValid(string vectorSize, string m);
+
+    bool IsReceivedVectorSizeValid(string vectorSize, string m);
 
     bool IsTextValid(string text);
 
@@ -94,8 +96,12 @@ public class ValidationService : IValidationService
     }
 
     // Method used to determine whether the input vector is of size (m + 1)
-    public bool IsVectorSizeValid(string vectorSize, string m)
+    public bool IsInputVectorSizeValid(string vectorSize, string m)
         => vectorSize.Length == (int.Parse(m) + 1);
+
+    // Method used to determine whether the received vector is of size (2^m)
+    public bool IsReceivedVectorSizeValid(string vectorSize, string m)
+        => vectorSize.Length == Math.Pow(2, int.Parse(m));
 
     // Method used to determine whether the input text is valid
     public bool IsTextValid(string text)

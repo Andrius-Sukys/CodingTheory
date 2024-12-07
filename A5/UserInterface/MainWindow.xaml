@@ -1,0 +1,24 @@
+﻿<Window x:Class="A5.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:A5"
+        xmlns:ui="clr-namespace:A5.UI"
+        mc:Ignorable="d"
+        Title="Coding Theory - A5 - Andrius Šukys" Width="1000" Height="800"
+        ResizeMode="NoResize">
+    <Grid TextElement.FontFamily="Bahnschrift" TextElement.FontSize="14pt">
+        <TabControl>
+            <TabItem Header=" Scenario One - Binary Vector ">
+                <ui:ScenarioOneControl />
+            </TabItem>
+            <TabItem Header=" Scenario Two - Text ">
+
+            </TabItem>
+            <TabItem Header=" Scenario Three - Image ">
+
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

@@ -5,6 +5,8 @@
 public interface INoisyChannelService
 {
     int[] GetOutputVector(int[] inputVector, double probabilityOfDistortion);
+
+    List<int> GetDistortedPositions(int[] sentVector, int[] receivedVector);
 }
 
 public class NoisyChannelService : INoisyChannelService
@@ -60,5 +62,25 @@ public class NoisyChannelService : INoisyChannelService
         bool shouldDistort = randomValue < probabilityOfDistortion;
 
         return shouldDistort;
+    }
+
+    // Method used to determine which positions within the vector have been distorted when sending
+    public List<int> GetDistortedPositions(int[] sentVector, int[] receivedVector)
+    {
+        // Initializing a list to store all positions that were distorted
+        List<int> distortedPositions = new List<int>();
+
+        // Working with every bit present in the sent vector
+        for (int i = 0; i < sentVector.Length; ++i)
+        {
+            // If values in the same position don't match for sent and received vector...
+            if (sentVector[i] != receivedVector[i])
+            {
+                // ... then that position gets added to the list of distorted positions
+                distortedPositions.Add(i);
+            }
+        }
+
+        return distortedPositions;
     }
 }
