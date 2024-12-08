@@ -123,7 +123,7 @@
                 <!-- Output Text -->
                 <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
                     <TextBlock Text="Output Text" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px"/>
-                    <TextBox x:Name="EncodedOutputTextTextBox" FontSize="16" VerticalContentAlignment="Center" AcceptsReturn="True" Width="385px" MinLines="2" MaxLines="2" />
+                    <TextBox x:Name="EncodedOutputTextTextBox" FontSize="16" AcceptsReturn="True" Width="385px" MinLines="2" MaxLines="2" />
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -157,7 +157,7 @@
                 <!-- Output Text -->
                 <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
                     <TextBlock Text="Output Text" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px"/>
-                    <TextBox x:Name="NotEncodedOutputTextTextBox" FontSize="16" VerticalContentAlignment="Center" AcceptsReturn="True" Width="385px" MinLines="2" MaxLines="2" />
+                    <TextBox x:Name="NotEncodedOutputTextTextBox" FontSize="16" AcceptsReturn="True" Width="385px" MinLines="2" MaxLines="2" />
                 </StackPanel>
             </StackPanel>
         </Border>

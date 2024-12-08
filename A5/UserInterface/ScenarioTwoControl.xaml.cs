@@ -96,6 +96,9 @@ public partial class ScenarioTwoControl : UserControl
     private void ResetWindowElements()
     {
         EncodedDecodedVectorTextBox.Text = string.Empty;
+        EncodedOutputTextTextBox.Text = string.Empty;
+        NotEncodedOutputTextTextBox.Text = string.Empty;
+
         EncodedReceivedVectorTextBox.Foreground = Brushes.Black;
     }
 
@@ -258,6 +261,9 @@ public partial class ScenarioTwoControl : UserControl
 
             int m = SentVectorLength - 1;
 
+            ReceivedVectorsEncoded = EncodedReceivedVectorTextBox.Text.Split(' ').Select(g => g.Select(c => int.Parse(c.ToString())).ToArray()).ToList();
+            ReceivedVectorsNotEncoded = NotEncodedReceivedVectorTextBox.Text.Split(' ').Select(g => g.Select(c => int.Parse(c.ToString())).ToArray()).ToList();
+
             if (isEncoded)
             {
                 foreach (int[] receivedVector in ReceivedVectorsEncoded)
@@ -297,12 +303,16 @@ public partial class ScenarioTwoControl : UserControl
 
     private void ClearResultFields()
     {
+        EncodedInputTextTextBox.Text = string.Empty;
         EncodedInputVectorTextBox.Text = string.Empty;
         EncodedEncodedVectorTextBox.Text = string.Empty;
         EncodedReceivedVectorTextBox.Text = string.Empty;
         EncodedDecodedVectorTextBox.Text = string.Empty;
+        EncodedOutputTextTextBox.Text = string.Empty;
 
+        NotEncodedInputTextTextBox.Text = string.Empty;
         NotEncodedInputVectorTextBox.Text = string.Empty;
         NotEncodedReceivedVectorTextBox.Text = string.Empty;
+        NotEncodedOutputTextTextBox.Text = string.Empty;
     }
 }
