@@ -22,4 +22,10 @@
     <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="UserInterface\ScenarioTwoControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

@@ -10,13 +10,16 @@
         ResizeMode="NoResize">
     <Grid TextElement.FontFamily="Bahnschrift" TextElement.FontSize="14pt">
         <TabControl>
-            <TabItem Header=" Scenario One - Binary Vector ">
+            <TabItem Header="    Scenario One - Binary Vector    ">
                 <ui:ScenarioOneControl />
             </TabItem>
-            <TabItem Header=" Scenario Two - Text ">
+            <TabItem Header="    Scenario Two - Text    ">
+                <ui:ScenarioTwoControl />
+            </TabItem>
+            <TabItem Header="    Scenario Three - Image    ">
 
             </TabItem>
-            <TabItem Header=" Scenario Three - Image ">
+            <TabItem Header="        Help and About        ">
 
             </TabItem>
         </TabControl>
