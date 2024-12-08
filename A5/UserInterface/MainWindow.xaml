@@ -19,11 +19,8 @@
             <TabItem Header="    Scenario Three - Image    ">
 
             </TabItem>
-            <TabItem Header="      Help      ">
+            <TabItem Header="        Help and About        ">
 
-            </TabItem>
-            <TabItem Header="    About    ">
-                
             </TabItem>
         </TabControl>
     </Grid>
