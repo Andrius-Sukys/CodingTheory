@@ -1,4 +1,7 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Windows.Media.Imaging;
 using Color = System.Drawing.Color;
 
 namespace A5.Services;
@@ -14,9 +17,9 @@ public interface IConverterService
 
     string GetTextFromVectors(List<int[]> vectors, int padding);
 
-    (List<int[]>, int, int, int) GetVectorsFromBMPImage(Bitmap image, int m);
+    (List<int[]>, int, int, int) GetVectorsFromBMPImage(BitmapImage image, int m);
 
-    Bitmap GetBMPImageFromVectors(List<int[]> vectors, int padding, int imageHeight, int imageWidth);
+    BitmapImage GetBMPImageFromVectors(List<int[]> vectors, int padding, int imageHeight, int imageWidth);
 }
 
 public class ConverterService : IConverterService
@@ -56,7 +59,7 @@ public class ConverterService : IConverterService
         return binaryValue;
     }
 
-    // Method used to convert text to binary and split to multiple vectors based on parameter m
+    // Method used to convert text to binary and split to multiple vectors based on parameter m (also returns padding)
     public (List<int[]>, int) GetVectorsFromText(string text, int m)
     {
         // Converting input text into UTF8 bytes where each byte represents a letter
@@ -72,7 +75,7 @@ public class ConverterService : IConverterService
         List<int[]> vectors = new List<int[]>();
 
         // The cycle goes until it covers all symbols of the binary text vector
-        for (int i = 0; i < binaryText.Length; i+= vectorSize)
+        for (int i = 0; i < binaryText.Length; i += vectorSize)
         {
             // Splitting the vectors and converting them to arrays of numbers
             vectors.Add(binaryText.Skip(i).Take(vectorSize).Select(s => s - '0').ToArray());
@@ -114,7 +117,7 @@ public class ConverterService : IConverterService
         return (vectors, padding);
     }
 
-    // Method used to convert multiple vectors to a single block of text
+    // Method used to convert multiple vectors to a single block of text (also takes padding)
     public string GetTextFromVectors(List<int[]> vectors, int padding)
     {
         // Joining all of the vectors into a single string of text
@@ -137,125 +140,140 @@ public class ConverterService : IConverterService
         return System.Text.Encoding.UTF8.GetString(utf8Bytes.ToArray());
     }
 
-    // Method used to convert a BMP picture to binary and split to multiple vectors based on parameter m
-    public (List<int[]>, int, int, int) GetVectorsFromBMPImage(Bitmap image, int m)
+    // Method used to convert a BMP image to binary vectors (also returns padding and height and width of the image)
+    public (List<int[]>, int, int, int) GetVectorsFromBMPImage(BitmapImage bitmapImage, int m)
     {
-        // Initializing a list to store RGB values for each pixel in the image
+        // Converting a BitmapImage to Bitmap (needed for pixel manipulation)
+        Bitmap bitmap = BitmapImageToBitmap(bitmapImage);
+
+        // Getting the width and height of the image
+        int width = bitmap.Width;
+        int height = bitmap.Height;
+
+        BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+        int bytesPerPixel = Image.GetPixelFormatSize(bitmap.PixelFormat) / 8;
+        int stride = bitmapData.Stride;
+        IntPtr ptr = bitmapData.Scan0;
+
+        byte[] pixelBuffer = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(ptr, pixelBuffer, 0, pixelBuffer.Length);
+        bitmap.UnlockBits(bitmapData);
+
         List<int> rgbValues = new List<int>();
-
-        // The cycle goes until it covers the whole height of the image
-        for (int y = 0; y < image.Height; ++y)
+        for (int i = 0; i < pixelBuffer.Length; i += bytesPerPixel)
         {
-            // The cycle goes until it covers the whole width of the image
-            for (int x = 0; x < image.Width; ++x)
-            {
-                // Getting the color of the pixel at (x, y) coordinate
-                Color pixel = image.GetPixel(x, y);
-
-                // Adding RGB values to the list
-                rgbValues.Add(pixel.R);
-                rgbValues.Add(pixel.G);
-                rgbValues.Add(pixel.B);
-            }
+            rgbValues.Add(pixelBuffer[i + 2]); // Red
+            rgbValues.Add(pixelBuffer[i + 1]); // Green
+            rgbValues.Add(pixelBuffer[i]);     // Blue
         }
 
-        // Converting RGB values (0-255) into binary representation, each takes up 8 characters with padding if needed 
+        // Convert RGB values to binary
         string binaryImage = string.Concat(rgbValues.Select(v => Convert.ToString(v, 2).PadLeft(8, '0')));
 
-        // Each of the split vectors should be of size (m + 1)
+        // Split binary into vectors of size (m + 1)
         int vectorSize = m + 1;
-
-        // Initializing a list to store split vectors
         List<int[]> vectors = new List<int[]>();
-
-        // The cycle goes until it covers all symbols of the binary image vector
         for (int i = 0; i < binaryImage.Length; i += vectorSize)
         {
-            // Splitting the vectors and converting them to arrays of numbers
-            vectors.Add(binaryImage.Skip(i).Take(vectorSize).Select(s => s - '0').ToArray());
+            vectors.Add(binaryImage.Skip(i).Take(vectorSize).Select(c => c - '0').ToArray());
         }
 
-        // Getting the last vector in the list
         int[] lastVector = vectors[vectors.Count - 1];
 
-        // Initializing a variable to store padding to be added to the last vector if any
+        // Handle padding for the last vector
         int padding = 0;
 
-        // If the size of the last vector is smaller than (m + 1), it should be padded
         if (lastVector.Length < vectorSize)
         {
-            // Calculating the padding that's needed for the last vector in the list
             padding = vectorSize - lastVector.Length;
 
-            // Initializing a new array to store the padded vector
             int[] paddedVector = new int[vectorSize];
 
-            // For the length of last vector...
-            for (int i = 0; i < lastVector.Length; ++i)
-            {
-                // ... the symbols should remain the same in the padded vector
-                paddedVector[i] = lastVector[i];
-            }
+            Array.Copy(lastVector, paddedVector, lastVector.Length);
 
-            // To satisfy the required size
-            for (int i = lastVector.Length; i < vectorSize; ++i)
-            {
-                // ... 0s should be appended to existing symbols
-                paddedVector[i] = 0;
-            }
-
-            // Replacing the initial last vector with the padded vector
-            vectors[vectors.Count - 1] = paddedVector;
+            vectors[^1] = paddedVector;
         }
 
-        return (vectors, padding, image.Height, image.Width);
+        return (vectors, padding, height, width);
     }
 
-    // Method used to convert multiple vectors to a BMP image
-    public Bitmap GetBMPImageFromVectors(List<int[]> vectors, int padding, int imageHeight, int imageWidth)
+    // Method used to convert binary vectors to a BMP image (also takes padding and height and width of the image)
+    public BitmapImage GetBMPImageFromVectors(List<int[]> vectors, int padding, int imageHeight, int imageWidth)
     {
-        // Joining all of the vectors into a single string of text
-        string binaryImage = string.Concat(vectors.SelectMany(v => v.Select(v => v.ToString())));
+        // Join vectors and safely remove padding
+        string binaryImage = string.Concat(vectors.SelectMany(v => v.Select(i => i.ToString())));
 
-        // Removing the padding that was added when converting text to vectors to match size of (m + 1)
-        binaryImage = binaryImage.Substring(0, binaryImage.Length - padding);
+        // Ensure the padding removal doesn't cause out-of-range issues
+        if (padding > 0 && padding <= binaryImage.Length)
+        {
+            binaryImage = binaryImage.Substring(0, binaryImage.Length - padding);
+        }
 
-        // Initializing a list to store RGB values for each pixel in the image
+        // Ensure the binary length is divisible by 8
+        int remainder = binaryImage.Length % 8;
+        if (remainder != 0)
+        {
+            // Pad the binary string with 0s to make it divisible by 8
+            binaryImage = binaryImage.PadRight(binaryImage.Length + (8 - remainder), '0');
+        }
+
+        // Convert binary string to RGB values
         List<int> rgbValues = new List<int>();
-
-        // The cycle goes until it covers all symbols of the binary vector
         for (int i = 0; i < binaryImage.Length; i += 8)
         {
-            // Convering each 8 bits in binary text vector to an RGB value (0-255) and adding it to the list
             rgbValues.Add(Convert.ToInt32(binaryImage.Substring(i, 8), 2));
         }
 
-        // Initializing a new Bitmap image to store the resulting image
-        Bitmap image = new Bitmap(imageWidth, imageHeight);
+        // Create a bitmap and populate it with RGB values
+        Bitmap bitmap = new Bitmap(imageWidth, imageHeight);
+        int index = 0;
 
-        // The cycle goes until it covers the whole height of the image
-        for (int y = 0; y < imageHeight; ++y)
+        for (int y = 0; y < imageHeight; y++)
         {
-            // The cycle goes until it covers the whole width of the image
-            for (int x = 0; x < imageWidth; ++x)
+            for (int x = 0; x < imageWidth; x++)
             {
-                // The cycle goes until it covers all RGB values from the list
-                for (int i = 0; i < rgbValues.Count; i += 3)
+                if (index + 2 < rgbValues.Count)
                 {
-                    // Extracting RGB values for pixel at position (x, y)
-                    int r = rgbValues[i];
-                    int g = rgbValues[i + 1];
-                    int b = rgbValues[i + 2];
-
-                    // Creating a color to display in the image
-                    Color color = Color.FromArgb(r, g, b);
-
-                    // Setting the color onto the pixel at position (x, y)
-                    image.SetPixel(x, y, color);
+                    // Extract RGB values and set the pixel color
+                    Color color = Color.FromArgb(rgbValues[index], rgbValues[index + 1], rgbValues[index + 2]);
+                    bitmap.SetPixel(x, y, color);
+                    index += 3;
+                }
+                else
+                {
+                    // Fill remaining pixels with black
+                    bitmap.SetPixel(x, y, Color.Black);
                 }
             }
         }
 
-        return image;
+        return BitmapToBitmapImage(bitmap);
+    }
+
+    private Bitmap BitmapImageToBitmap(BitmapImage bitmapImage)
+    {
+        using MemoryStream outStream = new();
+        BitmapEncoder encoder = new BmpBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+        encoder.Save(outStream);
+
+        outStream.Position = 0;
+        return new Bitmap(outStream);
+    }
+
+    private BitmapImage BitmapToBitmapImage(Bitmap bitmap)
+    {
+        using MemoryStream memory = new();
+        bitmap.Save(memory, ImageFormat.Bmp);
+        memory.Position = 0;
+
+        BitmapImage bitmapImage = new();
+        bitmapImage.BeginInit();
+        bitmapImage.StreamSource = memory;
+        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+        bitmapImage.EndInit();
+
+        return bitmapImage;
     }
 }

@@ -1,0 +1,81 @@
+﻿<UserControl x:Class="A5.UI.HelpAboutWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:wpfAnimatedGif="http://wpfanimatedgif.codeplex.com"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <!-- Main Grid -->
+    <Grid TextElement.FontFamily="Bahnschrift">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="288px" />
+            <RowDefinition Height="95px" />
+            <RowDefinition Height="137px" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#002346" Padding="10" Margin="0, 0, 0, 5">
+            <TextBlock Text="Help and About" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+        </Border>
+
+        <!-- General Tips for All Scenarios -->
+        <Border Grid.Row="1" BorderBrush="#002346" BorderThickness="2" Margin="5">
+            <StackPanel Margin="0, -1, 0, 0">
+                <TextBlock Text="General Tips for All Scenarios" Background="#002346" Foreground="White" Padding="0, 10, 0, 10" TextAlignment="Center" HorizontalAlignment="Stretch" />
+                <StackPanel Orientation="Vertical" Margin="10">
+                    <TextBlock Text="For better performance, choose a relatively low M value. Keep in mind that this may reduce the quality of results!" FontSize="16" Margin="5, 2, 0, 2" />
+                    <Separator Margin="5, 5, 5, 5" />
+                    <TextBlock Text="If relevant content is not fully visible, use the scroll wheel or click and drag the mouse to navigate vertically or horizontally." FontSize="16" Margin="5, 5, 0, 10" />
+                    <Image Width="600" HorizontalAlignment="Center" wpfAnimatedGif:ImageBehavior.AnimatedSource="pack://application:,,,/Resources/TextLinesHelp.gif" />
+                    <Separator Margin="5, 10, 5, 5" />
+                    <TextBlock Text="Don't forget to regularly clear logs (or disable logging altogether) to avoid degrading performance due to lack of memory." FontSize="16" Margin="5, 5, 0, 0" />
+                    <Separator Margin="5, 10, 5, 5" />
+                    <TextBlock Text="You may edit received vectors to impact decoding as needed. Received vectors can be edited in their respective text boxes." FontSize="16" Margin="5, 5, 0, 2" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Tips for Scenario 2 -->
+        <Border Grid.Row="2" BorderBrush="#002346" BorderThickness="2" Margin="5">
+            <StackPanel Margin="0, -1, 0, 0">
+                <TextBlock Text="Scenario 2" Background="#002346" Foreground="White" Padding="0, 10, 0, 10" TextAlignment="Center" HorizontalAlignment="Stretch" />
+                <StackPanel Orientation="Vertical" Margin="10">
+                    <TextBlock Text="You may input any UTF-8 characters (including Lithuanian letters) and enter text in multiple lines." FontSize="16" Margin="5, 0, 0, 0" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Tips for Scenario 3 -->
+        <Border Grid.Row="3" BorderBrush="#002346" BorderThickness="2" Margin="5">
+            <StackPanel Margin="0, -1, 0, 0">
+                <TextBlock Text="Scenario 3" Background="#002346" Foreground="White" Padding="0, 10, 0, 10" TextAlignment="Center" HorizontalAlignment="Stretch" />
+                <StackPanel Orientation="Vertical" Margin="10">
+                    <TextBlock Text="Only images of .BMP format are accepted. Convert the image to .BMP before uploading if the actual format is different." FontSize="16" Margin="5, 2, 0, 0" />
+                    <Separator Margin="5, 10, 5, 10" />
+                    <TextBlock Text="Images of higher resolution may take longer to send or decode and could crash the program due to lack of memory." FontSize="16" Margin="5, 0, 0, 2" /> 
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- About -->
+        <Border Grid.Row="4" BorderBrush="#002346" BorderThickness="2" Margin="5">
+            <StackPanel Margin="0, -1, 0, 0">
+                <TextBlock Text="About" Background="#002346" Foreground="White" Padding="0, 10, 0, 10" TextAlignment="Center" HorizontalAlignment="Stretch" />
+                <StackPanel Orientation="Vertical" Margin="15, 8, 0, 0">
+                    <TextBlock Text="This program was developed by 4th year student Andrius Šukys for the Coding Theory course taken at Vilnius University in 2024." FontSize="16" Margin="0, 5, 0, 5" />
+                    <TextBlock Text="The author implemented a variation of Reed-Muller code [RM(1, m)] that uses the Fast Hadamard Transform for decoding." FontSize="16" Margin="0, 5, 0, 5" />
+                    <TextBlock FontSize="16" Margin="0, 5, 0, 3">
+                        The project is hosted and freely available on GitHub:
+                        <Hyperlink NavigateUri="https://github.com/Andrius-Sukys/CodingTheory" RequestNavigate="NavigateToLink">
+                            https://github.com/Andrius-Sukys/CodingTheory
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

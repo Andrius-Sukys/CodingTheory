@@ -9,20 +9,20 @@
     <!-- Main Grid -->
     <Grid TextElement.FontFamily="Bahnschrift">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="6*"/>
-            <RowDefinition Height="5*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="6*" />
+            <RowDefinition Height="5*" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#002346" Padding="10"  Margin="0, 0, 0, 5">
-            <TextBlock Text="Scenario One - Binary Vector" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#002346" Padding="10" Margin="0, 0, 0, 5">
+            <TextBlock Text="Scenario One - Binary Vector" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
         </Border>
 
         <!-- Parameters -->
@@ -36,105 +36,113 @@
 
                 <!-- M -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5">
-                    <TextBlock Text="M :" Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="0, 0, 7, 0"/>
-                    <TextBox x:Name="InputM" Width="50" FontSize="20" VerticalContentAlignment="Center"/>
-                    <TextBlock Text="," Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="2, 0, 0, 0"/>
+                    <TextBlock Text="M :" Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="0, 0, 7, 0" />
+                    <TextBox x:Name="InputM" Width="50" FontSize="20" VerticalContentAlignment="Center" />
+                    <TextBlock Text="," Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="2, 0, 0, 0" />
                 </StackPanel>
 
                 <!-- Probability of Distortion -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5">
-                    <TextBlock Text="Probability of Distortion :" Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="0, 0, 7, 0"/>
-                    <TextBox x:Name="InputProbability" Width="70" FontSize="20" VerticalContentAlignment="Center"/>
-                    <TextBlock Text="," Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="2, 0, 0, 0"/>
+                    <TextBlock Text="Probability of Distortion :" Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="0, 0, 7, 0" />
+                    <TextBox x:Name="InputProbability" Width="70" FontSize="20" VerticalContentAlignment="Center" />
+                    <TextBlock Text="," Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="2, 0, 0, 0" />
                 </StackPanel>
 
                 <!-- Input Vector -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5">
-                    <TextBlock Text="Input Vector :" Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="0, 0, 7, 0"/>
-                    <TextBox x:Name="InputVector" Width="390" FontSize="20" VerticalContentAlignment="Center"/>
+                    <TextBlock Text="Input Vector :" Foreground="Black" FontSize="20" VerticalAlignment="Center" Margin="0, 0, 7, 0" />
+                    <TextBox x:Name="InputVector" Width="390" FontSize="20" VerticalContentAlignment="Center" />
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Encoded -->
+        <!-- With Encoding -->
         <Border Grid.Row="2" Grid.Column="0" BorderBrush="#002346" BorderThickness="2" Margin="5">
             <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="[E] - Encoded - With Encoding" Background="#002346" Foreground="White" Padding="0, 10, 0, 10" VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Stretch" Margin="-2, -32, -2, 35"/>
-                <Separator/>
+                <TextBlock Text="[E] - Encoded - With Encoding" Background="#002346" Foreground="White" Padding="0, 10, 0, 10" VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Stretch" Margin="-2, -32, -2, 35" />
+                <Separator />
 
                 <!-- Input Vector -->
                 <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
-                    <TextBlock Text="Input Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px"/>
-                    <TextBox x:Name="EncodedInputVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True"/>
+                    <TextBlock Text="Input Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px" />
+                    <TextBox x:Name="EncodedInputVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True" />
                 </StackPanel>
-                <Separator/>
+                <Separator />
 
                 <!-- Encoded Vector -->
                 <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
-                    <TextBlock Text="Encoded Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px"/>
-                    <TextBox x:Name="EncodedEncodedVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True"/>
+                    <TextBlock Text="Encoded Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px" />
+                    <TextBox x:Name="EncodedEncodedVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True" />
                 </StackPanel>
-                <Separator/>
+                <Separator />
 
                 <!-- Received Vector -->
                 <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
-                    <TextBlock Text="Received Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px"/>
-                    <TextBox x:Name="EncodedReceivedVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px"/>
+                    <TextBlock Text="Received Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px" />
+                    <TextBox x:Name="EncodedReceivedVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" />
                 </StackPanel>
-                <Separator/>
+                <Separator />
 
                 <!-- Decoded Vector -->
                 <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
-                    <TextBlock Text="Decoded Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px"/>
-                    <TextBox x:Name="EncodedDecodedVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True"/>
+                    <TextBlock Text="Decoded Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px" />
+                    <TextBox x:Name="EncodedDecodedVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True" />
                 </StackPanel>
-                <Separator/>
+                <Separator />
             </StackPanel>
         </Border>
 
+        <!-- Control Buttons and Logs Grid -->
         <Grid Grid.Row="2" Grid.Column="1" Grid.RowSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <!-- Clear Results Button -->
+            <Button x:Name="ClearResultsButton" Grid.Row="0" Content="Clear Results" Width="380" Height="40" Margin="0, 5, 0, 5" />
+
             <!-- Send and Decode Buttons -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0, 0, 0, 10">
-                <Button x:Name="SendButton" Content="Send" Width="185" Height="40" Margin="5, 5, 0, -5"/>
-                <Button x:Name="DecodeButton" Content="Decode" Width="185" Margin="10, 5, 0, -5"/>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0, 0, 0, 10">
+                <Button x:Name="SendButton" Content="Send" Width="185" Height="40" Margin="5, 5, 0, -5" />
+                <Button x:Name="DecodeButton" Content="Decode" Width="185" Margin="10, 5, 0, -5" />
             </StackPanel>
 
             <!-- Logs -->
-            <Border Grid.Row="1" BorderBrush="#002346" BorderThickness="2" Margin="5">
+            <Border Grid.Row="2" BorderBrush="#002346" BorderThickness="2" Margin="5">
                 <ScrollViewer>
-                    <TextBlock x:Name="LogsTextBlock" Text="" TextWrapping="Wrap" Foreground="#002346" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="5, 5, 5, 5"></TextBlock>
+                    <TextBlock x:Name="LogsTextBlock" Text="" TextWrapping="Wrap" Foreground="#002346" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="5, 5, 5, 5" />
                 </ScrollViewer>
             </Border>
 
-            <!-- Clear Logs Button -->
-            <Button x:Name="ClearLogsButton" Grid.Row="2" Content="Clear Logs" Width="Auto" Height="40" Margin="5"/>
+            <!-- Enable/Disable and Clear Logs Buttons -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="5">
+                <Button x:Name="ToggleLoggingButton" Content="Disable Logs" Width="185" Height="40" Margin="0, 0, 10, 0" />
+                <Button x:Name="ClearLogsButton" Grid.Row="3" Content="Clear Logs" Width="185" Height="40" />
+            </StackPanel>
         </Grid>
 
-        <!-- Not Encoded -->
+        <!-- Without Encoding -->
         <Border Grid.Row="3" Grid.Column="0" BorderBrush="#002346" BorderThickness="2" Margin="5">
             <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="[NE] - Not Encoded - Without Encoding" Background="#002346" Foreground="White" Padding="0, 10, 0, 10" VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Stretch" Margin="-2, -62, -2, 53"/>
-                <Separator/>
+                <TextBlock Text="[NE] - Not Encoded - Without Encoding" Background="#002346" Foreground="White" Padding="0, 10, 0, 10" VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Stretch" Margin="-2, -62, -2, 53" />
+                <Separator />
 
                 <!-- Input Vector -->
                 <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
-                    <TextBlock Text="Input Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px"/>
-                    <TextBox x:Name="NotEncodedInputVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True"/>
+                    <TextBlock Text="Input Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px" />
+                    <TextBox x:Name="NotEncodedInputVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True" />
                 </StackPanel>
-                <Separator/>
+                <Separator />
 
                 <!-- Received Vector -->
                 <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
-                    <TextBlock Text="Received Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px"/>
-                    <TextBox x:Name="NotEncodedReceivedVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px"/>
+                    <TextBlock Text="Received Vector" FontSize="20" Foreground="Black" VerticalAlignment="Center" Width="165px" />
+                    <TextBox x:Name="NotEncodedReceivedVectorTextBox" FontSize="20" VerticalContentAlignment="Center" Width="385px" IsReadOnly="True" />
                 </StackPanel>
-                <Separator/>
+                <Separator />
             </StackPanel>
         </Border>
     </Grid>
