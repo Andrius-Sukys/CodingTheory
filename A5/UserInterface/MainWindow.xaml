@@ -17,10 +17,10 @@
                 <ui:ScenarioTwoControl />
             </TabItem>
             <TabItem Header="    Scenario Three - Image    ">
-
+                <ui:ScenarioThreeControl />
             </TabItem>
             <TabItem Header="        Help and About        ">
-
+                <ui:HelpAboutWindow />
             </TabItem>
         </TabControl>
     </Grid>

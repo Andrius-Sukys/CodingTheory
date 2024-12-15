@@ -1,5 +1,9 @@
-﻿using System.Drawing;
-using Color = System.Drawing.Color;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace A5.Services;
 
@@ -14,9 +18,9 @@ public interface IConverterService
 
     string GetTextFromVectors(List<int[]> vectors, int padding);
 
-    (List<int[]>, int, int, int) GetVectorsFromBMPImage(Bitmap image, int m);
+    (List<int[]>, int, int, int) GetVectorsFromBMPImage(BitmapImage image, int m);
 
-    Bitmap GetBMPImageFromVectors(List<int[]> vectors, int padding, int imageHeight, int imageWidth);
+    BitmapImage GetBMPImageFromVectors(List<int[]> vectors, int padding, int imageHeight, int imageWidth);
 }
 
 public class ConverterService : IConverterService
@@ -56,7 +60,7 @@ public class ConverterService : IConverterService
         return binaryValue;
     }
 
-    // Method used to convert text to binary and split to multiple vectors based on parameter m
+    // Method used to convert text to binary and split to multiple vectors based on parameter m (also returns padding)
     public (List<int[]>, int) GetVectorsFromText(string text, int m)
     {
         // Converting input text into UTF8 bytes where each byte represents a letter
@@ -72,7 +76,7 @@ public class ConverterService : IConverterService
         List<int[]> vectors = new List<int[]>();
 
         // The cycle goes until it covers all symbols of the binary text vector
-        for (int i = 0; i < binaryText.Length; i+= vectorSize)
+        for (int i = 0; i < binaryText.Length; i += vectorSize)
         {
             // Splitting the vectors and converting them to arrays of numbers
             vectors.Add(binaryText.Skip(i).Take(vectorSize).Select(s => s - '0').ToArray());
@@ -114,7 +118,7 @@ public class ConverterService : IConverterService
         return (vectors, padding);
     }
 
-    // Method used to convert multiple vectors to a single block of text
+    // Method used to convert multiple vectors to a single block of text (also takes padding)
     public string GetTextFromVectors(List<int[]> vectors, int padding)
     {
         // Joining all of the vectors into a single string of text
@@ -137,29 +141,51 @@ public class ConverterService : IConverterService
         return System.Text.Encoding.UTF8.GetString(utf8Bytes.ToArray());
     }
 
-    // Method used to convert a BMP picture to binary and split to multiple vectors based on parameter m
-    public (List<int[]>, int, int, int) GetVectorsFromBMPImage(Bitmap image, int m)
+    // Method used to convert a BMP image to binary vectors (also returns padding and height and width of the image)
+    public (List<int[]>, int, int, int) GetVectorsFromBMPImage(BitmapImage bitmapImage, int m)
     {
-        // Initializing a list to store RGB values for each pixel in the image
+        // Initializing memory stream to temporarily store image data
+        MemoryStream memoryStream = new MemoryStream();
+
+        // Initializing an encoder for the bitmap image
+        BitmapEncoder encoder = new BmpBitmapEncoder();
+
+        // Adding the image to that encoder as a frame (image data format supported by the encoder)
+        encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+
+        // Saving the encoded image to the memory stream
+        encoder.Save(memoryStream);
+
+        // Resetting the memory stream's position to the beginning
+        memoryStream.Position = 0;
+
+        // Loading the image from the memory stream using ImageSharp library
+        using var image = SixLabors.ImageSharp.Image.Load<Rgb24>(memoryStream);
+
+        // Getting the width and height of the image
+        int width = image.Width;
+        int height = image.Height;
+
+        // Initializing a new list to store RGB values of that image
         List<int> rgbValues = new List<int>();
 
-        // The cycle goes until it covers the whole height of the image
-        for (int y = 0; y < image.Height; ++y)
+        // Working with each pixel row of the image
+        for (int y = 0; y < height; y++)
         {
-            // The cycle goes until it covers the whole width of the image
-            for (int x = 0; x < image.Width; ++x)
+            // Working with each pixel inside that row
+            for (int x = 0; x < width; x++)
             {
-                // Getting the color of the pixel at (x, y) coordinate
-                Color pixel = image.GetPixel(x, y);
+                // Accessing each pixel at coordinates of [x; y]
+                var pixel = image[x, y];
 
-                // Adding RGB values to the list
+                // Adding the reg, green and blue values of that pixel to the list
                 rgbValues.Add(pixel.R);
                 rgbValues.Add(pixel.G);
                 rgbValues.Add(pixel.B);
             }
         }
 
-        // Converting RGB values (0-255) into binary representation, each takes up 8 characters with padding if needed 
+        // Converting these RGB values into binary representation, each byte takes up 8 characters with padding if needed
         string binaryImage = string.Concat(rgbValues.Select(v => Convert.ToString(v, 2).PadLeft(8, '0')));
 
         // Each of the split vectors should be of size (m + 1)
@@ -208,54 +234,76 @@ public class ConverterService : IConverterService
             vectors[vectors.Count - 1] = paddedVector;
         }
 
-        return (vectors, padding, image.Height, image.Width);
+        return (vectors, padding, height, width);
     }
 
-    // Method used to convert multiple vectors to a BMP image
-    public Bitmap GetBMPImageFromVectors(List<int[]> vectors, int padding, int imageHeight, int imageWidth)
+    // Method used to convert binary vectors to a BMP image (also takes padding and height and width of the image)
+    public BitmapImage GetBMPImageFromVectors(List<int[]> vectors, int padding, int imageHeight, int imageWidth)
     {
         // Joining all of the vectors into a single string of text
-        string binaryImage = string.Concat(vectors.SelectMany(v => v.Select(v => v.ToString())));
+        string binaryImage = string.Concat(vectors.SelectMany(v => v.Select(i => i.ToString())));
 
-        // Removing the padding that was added when converting text to vectors to match size of (m + 1)
+        // Removing the padding that was added when converting the image to vectors to match size of (m + 1)
         binaryImage = binaryImage.Substring(0, binaryImage.Length - padding);
 
-        // Initializing a list to store RGB values for each pixel in the image
+        // Initializing a list or numbers to hold RGB values of the image
         List<int> rgbValues = new List<int>();
 
         // The cycle goes until it covers all symbols of the binary vector
         for (int i = 0; i < binaryImage.Length; i += 8)
         {
-            // Convering each 8 bits in binary text vector to an RGB value (0-255) and adding it to the list
+            // Convering each 8 bits in binary image vector to an RGB value and adding it to the list
             rgbValues.Add(Convert.ToInt32(binaryImage.Substring(i, 8), 2));
         }
 
-        // Initializing a new Bitmap image to store the resulting image
-        Bitmap image = new Bitmap(imageWidth, imageHeight);
+        // Creating a new image of the same size as the original image
+        var image = new Image<Rgb24>(imageWidth, imageHeight);
 
-        // The cycle goes until it covers the whole height of the image
-        for (int y = 0; y < imageHeight; ++y)
+        // Initializing a variable to keep track of index within the list of RGB values
+        int index = 0;
+
+        // Working with each pixel row of the image
+        for (int y = 0; y < imageHeight; y++)
         {
-            // The cycle goes until it covers the whole width of the image
-            for (int x = 0; x < imageWidth; ++x)
+            // Working with each pixel inside that row
+            for (int x = 0; x < imageWidth; x++)
             {
-                // The cycle goes until it covers all RGB values from the list
-                for (int i = 0; i < rgbValues.Count; i += 3)
-                {
-                    // Extracting RGB values for pixel at position (x, y)
-                    int r = rgbValues[i];
-                    int g = rgbValues[i + 1];
-                    int b = rgbValues[i + 2];
+                // Image's pixel at coordinates [x; y] gets populated its RGB values from the list
+                image[x, y] = new Rgb24(
+                    (byte)rgbValues[index],
+                    (byte)rgbValues[index + 1],
+                    (byte)rgbValues[index + 2]
+                );
 
-                    // Creating a color to display in the image
-                    Color color = Color.FromArgb(r, g, b);
-
-                    // Setting the color onto the pixel at position (x, y)
-                    image.SetPixel(x, y, color);
-                }
+                // Index gets shifted by 3 as 3 values were used (for red, green and blue)
+                index += 3;
             }
         }
 
-        return image;
+        // Initializing memory stream to temporarily store image data
+        using MemoryStream memoryStream = new MemoryStream();
+
+        // Saving the image in memory stream using BMP format
+        image.SaveAsBmp(memoryStream);
+
+        // Resetting the memory stream's position to the beginning
+        memoryStream.Position = 0;
+
+        // Creating a new bitmap image
+        BitmapImage bitmapImage = new BitmapImage();
+
+        // Marking the start of initialization of this bitmap image
+        bitmapImage.BeginInit();
+
+        // Assigning the memory stream as the source for the image
+        bitmapImage.StreamSource = memoryStream;
+
+        // Noting that the image data is immediately loaded into memory
+        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+
+        // Marking the end of initialization of this bitmap image
+        bitmapImage.EndInit();
+
+        return bitmapImage;
     }
 }
