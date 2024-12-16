@@ -35,6 +35,15 @@ namespace A5.UI
         // Initializing a variable to store the uploaded image
         private BitmapImage UploadedImage = new BitmapImage();
 
+        // Initializing a variable to keep track of experiment mode status (enabled/disabled)
+        private bool _isExperimentModeEnabled = false;
+
+        // Declaring time variables for the experiment mode
+        private DateTime _sendStartTime;
+        private DateTime _sendEndTime;
+        private DateTime _decodeStartTime;
+        private DateTime _decodeEndTime;
+
         public ScenarioThreeControl()
         {
             // Initializing the window
@@ -75,8 +84,29 @@ namespace A5.UI
                     // Window elements are reset to clean any marked errors or results
                     ResetWindowElements();
 
+                    // If experiment mode is enabled ...
+                    if (_isExperimentModeEnabled)
+                    {
+                        // ... saving the current time as time when sending begins
+                        _sendStartTime = DateTime.UtcNow;
+                    }
+
                     // Vector is sent both with and without encoding
                     SendVectors(isEncoded: true);
+
+                    // If experiment mode is enabled ...
+                    if (_isExperimentModeEnabled)
+                    {
+                        // ... saving the current time as time when sending ends
+                        _sendEndTime = DateTime.UtcNow;
+
+                        // Calculating the duration of sending
+                        int sendDuration = Convert.ToInt32((_sendEndTime - _sendStartTime).TotalMilliseconds);
+
+                        // Updating the logs
+                        AppendToLogs($"[E] (M = {SentVectorLength - 1}) Time to Send: {sendDuration} ms", shouldLogWhenDisabled: true);
+                    }
+
                     SendVectors(isEncoded: false);
                 }
 
@@ -92,8 +122,28 @@ namespace A5.UI
                 // If the input is valid...
                 if (isReceiveInputValid)
                 {
+                    // If experiment mode is enabled ...
+                    if (_isExperimentModeEnabled)
+                    {
+                        // ... saving the current time as time when decoding begins
+                        _decodeStartTime = DateTime.UtcNow;
+                    }
+
                     // The encoded vector is decoded
                     DecodeVectors();
+
+                    // If experiment mode is enabled ...
+                    if (_isExperimentModeEnabled)
+                    {
+                        // ... saving the current time as time when decoding ends
+                        _decodeEndTime = DateTime.UtcNow;
+
+                        // Calculating the duration of decoding
+                        var sendDuration = Convert.ToInt32((_decodeEndTime - _decodeStartTime).TotalMilliseconds);
+
+                        // Updating the logs
+                        AppendToLogs($"[E] (M = {SentVectorLength - 1}) Time to Decode: {sendDuration} ms", shouldLogWhenDisabled: true);
+                    }
                 }
 
                 return;
@@ -135,6 +185,26 @@ namespace A5.UI
             {
                 // The logs get cleared
                 ClearLogs();
+            };
+
+            // When "Enable/Disable Experiment Mode" button is clicked...
+            ToggleExperimentModeButton.Click += (_, _) =>
+            {
+                // Experiment mode status is changed
+                _isExperimentModeEnabled = !_isExperimentModeEnabled;
+
+                // Text for the button gets changed
+                ToggleExperimentModeButton.Content = _isExperimentModeEnabled ? "Disable Experiment Mode" : "Enable Experiment Mode";
+
+                // Logs are updated
+                if (_isExperimentModeEnabled)
+                {
+                    AppendToLogs("Experiment Mode Enabled!", shouldLogWhenDisabled: true);
+                }
+                else
+                {
+                    AppendToLogs("Experiment Mode Disabled.", shouldLogWhenDisabled: true);
+                }
             };
         }
 
@@ -377,6 +447,16 @@ namespace A5.UI
                 {
                     // Image block (without encoding) is updated by converting these received vectors to a picture and displaying it
                     NotEncodedImage.Source = _converterService.GetBMPImageFromVectors(ReceivedVectorsNotEncoded, LastVectorPadding, height, width);
+
+                    // If experiment mode is enabled ...
+                    if (_isExperimentModeEnabled)
+                    {
+                        // ... then the mismatch between the input image and the image without encoding is calculated
+                        double mismatchPercentage = CalculatePixelMismatchPercentage((BitmapSource)InputImage.Source, (BitmapSource)NotEncodedImage.Source);
+
+                        // Logs are updated
+                        AppendToLogs($"[NE] (M = {SentVectorLength - 1}) Pixel Mismatch: {mismatchPercentage:F2}%", shouldLogWhenDisabled: true);
+                    }
                 }
             }
             catch (Exception ex) // If any unforseen error occurs...
@@ -426,6 +506,16 @@ namespace A5.UI
 
                 // Image block (with encoding) is updated by converting these received vectors to a picture and displaying it
                 EncodedImage.Source = _converterService.GetBMPImageFromVectors(decodedVectors, LastVectorPadding, UploadedImage.PixelHeight, UploadedImage.PixelWidth);
+
+                // If experiment mode is enabled ...
+                if (_isExperimentModeEnabled)
+                {
+                    // ... then the mismatch between the input image and the image with encoding is calculated
+                    double mismatchPercentage = CalculatePixelMismatchPercentage((BitmapSource)InputImage.Source, (BitmapSource)EncodedImage.Source);
+
+                    // Logs are updated
+                    AppendToLogs($"[E] (M = {SentVectorLength - 1}) Pixel Mismatch: {mismatchPercentage:F2}%", shouldLogWhenDisabled: true);
+                }
 
                 // Logs are updated
                 AppendToLogs("[E] Successfully decoded image from encoded vectors.");
@@ -483,6 +573,47 @@ namespace A5.UI
             InputImage.Source = null;
             EncodedImage.Source = null;
             NotEncodedImage.Source = null;
+        }
+
+        // Method used to calculate pixel mismatch percentage between two images
+        private double CalculatePixelMismatchPercentage(BitmapSource image1, BitmapSource image2)
+        {
+            // Getting the width of the image
+            int width = image1.PixelWidth;
+
+            // Getting the height of the image
+            int height = image1.PixelHeight;
+
+            // Calculating the count of total pixels
+            int totalPixels = width * height;
+
+            // Initializing variables to store RGB values for both images
+            byte[] image1RgbValues = new byte[width * height * 4];
+            byte[] image2RgbValues = new byte[width * height * 4];
+
+            // Copying pixel data to these lists of RGB values
+            // Taking 4 values each time because Alpha is there but it should not be considered in this case
+            image1.CopyPixels(image1RgbValues, width * 4, 0);
+            image2.CopyPixels(image2RgbValues, width * 4, 0);
+
+            // Initializing a variable to hold the count of mismatches
+            int mismatchCount = 0;
+
+            // Comparing all RGB values that there are
+            for (int i = 0; i < image1RgbValues.Length; i += 4)
+            {
+                // If any of the RGB values mismatch ...
+                if (image1RgbValues[i] != image2RgbValues[i]       
+                    || image1RgbValues[i + 1] != image2RgbValues[i + 1] 
+                    || image1RgbValues[i + 2] != image2RgbValues[i + 2]) 
+                {
+                    // ... the mismatch count gets increased by one
+                    mismatchCount++;
+                }
+            }
+
+            // Calculating the mismatch percentage
+            return (mismatchCount / (double)totalPixels) * 100;
         }
     }
 }
